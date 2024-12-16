@@ -1,0 +1,763 @@
+---
+#title: "Group 4_Final Project_Markdown"
+#author: "Nathan Alegria", "Tessa Florek", "Ryan Brown", "Pierina Logrono"
+#date: "2022-12-20"
+#output: html_document
+---
+OBJECTIVE: To understand the relationship between fuel prices (gasoline and electricity) and sales of electric, hybrid, and conventional fuel (gasoline) powered cars, and to analyze whether maintenance costs and the cost of ownership of plug-in hybrid electric vehicle (PHEV) and electric vehicle (EV) vehicles have influenced the change in Electric & Hybrid vehicle sales.
+
+```{r}
+
+#These are the packages used:
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(readxl)
+library(scales)
+
+```
+
+Below, the data on the price of gasoline per data is read in. The dataset was found on Kaggle. The variables are as follows: 
+Date: MM/DD/YYYY with associated gas price
+A1: Weekly U.S. All Grades All Formulations Retail Gasoline Prices (Dollars per Gallon)
+A2: Weekly U.S. All Grades Conventional Retail Gasoline Prices (Dollars per Gallon)
+A3: Weekly U.S. All Grades Reformulated Retail Gasoline Prices (Dollars per Gallon)
+R1: Weekly U.S. Regular All Formulations Retail Gasoline Prices (Dollars per Gallon)
+R2: Weekly U.S. Regular Conventional Retail Gasoline Prices (Dollars per Gallon)
+R3: Weekly U.S. Regular Reformulated Retail Gasoline Prices (Dollars per Gallon)
+M1: Weekly U.S. Midgrade All Formulations Retail Gasoline Prices (Dollars per Gallon)
+M2: Weekly U.S. Midgrade Conventional Retail Gasoline Prices (Dollars per Gallon)
+M3: Weekly U.S. Midgrade Reformulated Retail Gasoline Prices (Dollars per Gallon)
+P1: Weekly U.S. Premium All Formulations Retail Gasoline Prices (Dollars per Gallon)
+P2: Weekly U.S. Premium Conventional Retail Gasoline Prices (Dollars per Gallon)
+P3: Weekly U.S. Premium Reformulated Retail Gasoline Prices (Dollars per Gallon)
+D1: Weekly U.S. No 2 Diesel Retail Prices (Dollars per Gallon)
+
+We chose to break the data up by year and use the A1 variable: all formulations, all grades retail gas prices in dollars per gallon. Then, we took the average per year to facilitate comparison with other variables. We plotted the averages to get an idea of the trends, and also to make sure the average values looked okay. 
+```{r}
+
+#Price of Gasoline Data (Slide 4)
+
+gas_prices <- read.csv("/Users/broiwniemixxx/Desktop/Project DataSets/PET_PRI_GND_DCUS_NUS_W.csv") #import gas prices dataset from kaggle
+head(gas_prices) #display some data
+#break the data up by year & take the average
+yr95 <- gas_prices[1:52,] 
+avg95 <- mean(yr95$A1)
+yr96 <- gas_prices[53:105,]
+avg96 <- mean(yr96$A1)
+yr97 <- gas_prices[106:157,]
+avg97 <- mean(yr97$A1)
+yr98 <- gas_prices[158:209,]
+avg98 <- mean(yr98$A1)
+yr99 <- gas_prices[210:261,]
+avg99 <- mean(yr99$A1)
+yr00 <- gas_prices[262:313,]
+avg00 <- mean(yr00$A1)
+yr01 <- gas_prices[314:366,]
+avg01 <- mean(yr01$A1)
+yr02 <- gas_prices[367:418,]
+avg02 <- mean(yr02$A1)
+yr03 <- gas_prices[419:470,]
+avg03 <- mean(yr03$A1)
+yr04 <- gas_prices[471:522,]
+avg04 <- mean(yr04$A1)
+yr05 <- gas_prices[523:574,]
+avg05 <- mean(yr05$A1)
+yr06 <- gas_prices[575:626,]
+avg06 <- mean(yr06$A1)
+yr07 <- gas_prices[627:679,]
+avg07 <- mean(yr07$A1)
+yr08 <- gas_prices[680:731,]
+avg08 <- mean(yr08$A1)
+yr09 <- gas_prices[732:783,]
+avg09 <- mean(yr09$A1)
+yr10 <- gas_prices[784:835,]
+avg10 <- mean(yr10$A1)
+yr11 <- gas_prices[836:887,]
+avg11 <- mean(yr11$A1)
+yr12 <- gas_prices[888:940,]
+avg12 <- mean(yr12$A1)
+yr13 <- gas_prices[941:992,]
+avg13 <- mean(yr13$A1)
+yr14 <- gas_prices[993:1044,]
+avg14 <- mean(yr14$A1)
+yr15 <- gas_prices[1045:1096,]
+avg15 <- mean(yr15$A1)
+yr16 <- gas_prices[1097:1148,]
+avg16 <- mean(yr16$A1)
+yr17 <- gas_prices[1149:1200,]
+avg17 <- mean(yr17$A1)
+yr18 <- gas_prices[1201:1253,]
+avg18 <- mean(yr18$A1)
+yr19 <- gas_prices[1254:1305,]
+avg19 <- mean(yr19$A1)
+yr20 <- gas_prices[1306:1357,]
+avg20 <- mean(yr20$A1)
+yr21 <- gas_prices[1358:1361,]
+avg21 <- mean(yr21$A1)
+#create year variable
+year <- c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021)
+#combine average prices into an array
+avg_price <- c(avg95, avg96, avg97, avg98, avg99, avg00, avg01, avg02, avg03, avg04, avg05, avg06, avg07, avg08, avg09, avg10, avg11, avg12, avg13, avg14, avg15, avg16, avg17, avg18, avg19, avg20, avg21)
+#create data frame with this data
+avgs <- data.frame(year,avg_price)
+#plot average gas price data
+gas <- ggplot(avgs,aes(x=year,y=avg_price))+geom_line()+ggtitle("Average Price of Gasoline Per Year")
+#display plot
+gas
+
+```
+
+In addition to the price of gasoline, we also wanted to investigate the trends in the price of a gas powered car and what relationship - if any - that had to the price of gasoline. We found a dataset on Kaggle that had this information, which is read in below. The variables are as follows: 
+Year: vehicle registration year
+Price: sale price of vehicle in ad
+Brand: brand of car
+Model: type of car (ex: sedan)
+Title Status: status of title
+Mileage: odometer reading on car
+Color: color
+VIN: vehicle identification number
+State: state where vehicle is located
+Country: country where vehicle is located (US or Canada)
+Condition: how long the car has been on the market
+Similarly to the gas prices, we split the data up by year and found the average price per year. We also plotted the data, coloring the plot by the make of the car. There is a noticeable increasing trend in price as years increase.
+
+```{r}
+#read in car price data here
+us_cars <- read.csv("/Users/broiwniemixxx/Desktop/Project DataSets/USA_cars_datasets.csv") #import us cars dataset from kaggle
+head(us_cars)
+#plot data
+ggplot() + geom_point(data=us_cars,aes(x=year,y=price,color=brand)) + ggtitle("Change in Price of Gas Powered Cars")
+#rearrange data by year
+us_cars <- us_cars %>%
+  arrange(by=year)
+#separate the data by year and find the average price, excluding 0 entries
+cars95 <- us_cars[us_cars$year == 1995,]
+avg_cars95 <- mean(cars95$price[cars95$price > 0])
+cars96 <- us_cars[us_cars$year == 1996,]
+avg_cars96 <- mean(cars96$price[cars96$price > 0])
+cars97 <- us_cars[us_cars$year == 1997,]
+avg_cars97 <- mean(cars97$price[cars97$price > 0])
+cars98 <- us_cars[us_cars$year == 1998,]
+avg_cars98 <- mean(cars98$price[cars98$price > 0])
+cars99 <- us_cars[us_cars$year == 1999,]
+avg_cars99 <- mean(cars99$price[cars99$price > 0])
+cars00 <- us_cars[us_cars$year == 2000,]
+avg_cars00 <- mean(cars00$price[cars00$price > 0])
+cars01 <- us_cars[us_cars$year == 2001,]
+avg_cars01 <- mean(cars01$price[cars01$price > 0])
+cars02 <- us_cars[us_cars$year == 2002,]
+avg_cars02 <- mean(cars02$price[cars02$price > 0])
+cars03 <- us_cars[us_cars$year == 2003,]
+avg_cars03 <- mean(cars03$price[cars03$price > 0])
+cars04 <- us_cars[us_cars$year == 2004,]
+avg_cars04 <- mean(cars04$price[cars04$price > 0])
+cars05 <- us_cars[us_cars$year == 2005,]
+avg_cars05 <- mean(cars05$price[cars05$price > 0])
+cars06 <- us_cars[us_cars$year == 2006,]
+avg_cars06 <- mean(cars06$price[cars06$price > 0])
+cars07 <- us_cars[us_cars$year == 2007,]
+avg_cars07 <- mean(cars07$price[cars07$price > 0])
+cars08 <- us_cars[us_cars$year == 2008,]
+avg_cars08 <- mean(cars08$price[cars08$price > 0])
+cars09 <- us_cars[us_cars$year == 2009,]
+avg_cars09 <- mean(cars09$price[cars09$price > 0])
+cars10 <- us_cars[us_cars$year == 2010,]
+avg_cars10 <- mean(cars10$price[cars10$price > 0])
+cars11 <- us_cars[us_cars$year == 2011,]
+avg_cars11 <- mean(cars11$price[cars11$price > 0])
+cars12 <- us_cars[us_cars$year == 2012,]
+avg_cars12 <- mean(cars12$price[cars12$price > 0])
+cars13 <- us_cars[us_cars$year == 2013,]
+avg_cars13 <- mean(cars13$price[cars13$price > 0])
+cars14 <- us_cars[us_cars$year == 2014,]
+avg_cars14 <- mean(cars14$price[cars14$price > 0])
+cars15 <- us_cars[us_cars$year == 2015,]
+avg_cars15 <- mean(cars15$price[cars15$price > 0])
+cars16 <- us_cars[us_cars$year == 2016,]
+avg_cars16 <- mean(cars16$price[cars16$price > 0])
+cars17 <- us_cars[us_cars$year == 2017,]
+avg_cars17 <- mean(cars17$price[cars17$price > 0])
+cars18 <- us_cars[us_cars$year == 2018,]
+avg_cars18 <- mean(cars18$price[cars18$price > 0])
+cars19 <- us_cars[us_cars$year == 2019,]
+avg_cars19 <- mean(cars19$price[cars19$price > 0])
+cars20 <- us_cars[us_cars$year == 2020,]
+avg_cars20 <- mean(cars20$price[cars20$price > 0])
+cars21 <- us_cars[us_cars$year == 2021,]
+avg_cars21 <- mean(cars21$price[cars21$price > 0])
+
+#make an array with the average car prices
+avg_car_price <- c(avg_cars95, avg_cars96, avg_cars97, avg_cars98, avg_cars99, avg_cars00, avg_cars01, avg_cars02, avg_cars03, avg_cars04, avg_cars05, avg_cars06, avg_cars07, avg_cars08, avg_cars09, avg_cars10, avg_cars11, avg_cars12, avg_cars13, avg_cars14, avg_cars15, avg_cars16, avg_cars17, avg_cars18, avg_cars19, avg_cars20, avg_cars21)
+
+#create data frame with both average car price and average gas price
+tess_data <- data.frame(year,avg_car_price,avg_price)
+#rename columns
+colnames(tess_data)[2] <- "average price of car"
+colnames(tess_data)[3] <- "average price of gas per gallon"
+```
+
+```{r}
+#Average Cost of Electricity Per KWh from 2012-2022 (Slide 5)
+
+#Original dataset is from data.bls.gov.  The original data set has the prices by month and year. Here we calculated the 
+#average cost per Kwh for each month and plotted the averages into a linear graph to see the trend.  Here we see a the 
+#average cost per kwh steadily increase from 2012-2014, and then another steady but more drastic increase from 2020 to 
+# 2022.
+electr <- read_excel("/Users/broiwniemixxx/Desktop/Project DataSets/SeriesReport-20221211203810_50edad.xlsx")
+str(electr)
+tail(electr)
+head(electr, 20)
+#Remove unnecessary rows
+electr2012_2022 <- electr[-1:-9,]
+head(electr2012_2022)
+colnames(electr2012_2022)
+#Rename columns appropriately
+cnames <- c("Year", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+colnames(electr2012_2022) <- cnames
+head(electr2012_2022)
+rownames(electr2012_2022)
+#rename rows
+rnames <- c("2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022")
+rownames(electr2012_2022) <- rnames
+head(electr2012_2022)
+rownames(electr2012_2022)
+#Convert datapoint from characters to numeric
+electr2012_2022$Jan <-as.numeric(electr2012_2022$Jan) 
+electr2012_2022$Feb <-as.numeric(electr2012_2022$Feb) 
+electr2012_2022$Mar<-as.numeric(electr2012_2022$Mar) 
+electr2012_2022$Apr <-as.numeric(electr2012_2022$Apr) 
+electr2012_2022$May <-as.numeric(electr2012_2022$May) 
+electr2012_2022$Jun <-as.numeric(electr2012_2022$Jun) 
+electr2012_2022$Jul <-as.numeric(electr2012_2022$Jul) 
+electr2012_2022$Aug <-as.numeric(electr2012_2022$Aug) 
+electr2012_2022$Sep <-as.numeric(electr2012_2022$Sep) 
+electr2012_2022$Oct <-as.numeric(electr2012_2022$Oct) 
+electr2012_2022$Nov <-as.numeric(electr2012_2022$Nov) 
+electr2012_2022$Dec <-as.numeric(electr2012_2022$Dec) 
+electr2012_2022$Year <- as.numeric(electr2012_2022$Year)
+
+
+# Dataframe for Average charge of Electricity per year from Electr2012_2022 data
+electr2012_2022$AverageElectricChargeYear<- rowMeans(electr2012_2022[,2:12], na.rm=TRUE)
+electr2012_2022$AverageElectricChargeYear
+AverageCostPerYear <- data.frame(electr2012_2022$Year,electr2012_2022$AverageElectricChargeYear)
+AverageCostPerYear
+#line chart of average cost per year dataframe
+AverageCostPerYearLine <- AverageCostPerYear %>%
+  ggplot(aes(x = electr2012_2022.Year, y = electr2012_2022.AverageElectricChargeYear ))+
+  geom_line(color="blue", linewidth = 1) + scale_x_continuous(breaks = seq(2012,2022,1))+
+  geom_point(color="black",size = 1) +
+  labs(x = "Year", y = "Average Cost") +
+  ggtitle("Average Electric Cost per KWH Yearly")
+AverageCostPerYearLine
+
+```
+
+Below, we made a plot to compare gas price per gallon and electricity cost per kilowatt hour. We read in the electricity cost dataset we chose for this comparison. The variables are the same as listed above.The cost of electricity was multiplied by a factor of 10 so that the trends could be seen against the price of gas. No factor was introduced to the gas prices.
+
+```{r}
+#Comparison of Gas & Electricity Prices (Slide 6)
+
+#read in electricity cost data
+electricity_cost <- read.csv('/Users/broiwniemixxx/Desktop/Project DataSets/electricitycost (1).csv')
+head(electricity_cost)
+#save average cost as a separate variable
+avg_ecost <- electricity_cost$AverageCost
+#cut the variable to match the date range (2019-2019)
+avg_ecost <- avg_ecost[-9:-11]
+#multiply by factor of 10 for the sake of data comparison
+avg_ecost <- 10*avg_ecost
+#cutting data saved previously for the sake of a consistent date range (cut twice to take rows off the beginning and end)
+plot_data <- tess_data[-1:-17,]
+plotdata <- plot_data[-9:-10,]
+#add average cost of electricity to dataframe
+plot_data <- data.frame(plotdata,avg_ecost)
+#plot both average gas and electricity costs on same plot
+plot_data %>%
+  ggplot() + geom_line(aes(x=year,y=average.price.of.gas.per.gallon,color = "gas")) + geom_line(aes(x=year,y=avg_ecost,color="10*electric"))+ggtitle('Gas vs Electricity Cost') + labs(x='year',y='price') +scale_color_manual(name="Vehicle Type", labels=c("Electric", "Gas"), values=c("blue", "green"))
+
+```
+Below we analyzed the growth of electric vehicle (EV) and plug-in hybrid electric vehicle (PHEV) sales using this dataset. The data was used to visualize the trends in sales of these types of vehicles over time. Our goal was to understand how the market for these vehicles is evolving and what factors may be driving changes in sales. We created plots of the data to visualize the growth in sales of EV and PHEV vehicles and compare them to gasoline vehicle sales. By doing so, we aimed to gain insights into the relative performance of these types of vehicles in the market. 
+
+The variables used are:
+Vehicle - The model of vehicle
+Type - Categorized whether a vehicle was a plug-in hybrid electric (PHEV) or electric vehicle (EV)
+Sales - Total Sales per Year
+Year - Year of PHEV or EV Sales
+
+```{r}
+#Growth of EV & PHEV Sales from 2010-2019 (Slide 10)
+
+PEVSales <- read_excel("/Users/broiwniemixxx/Desktop/Project DataSets/PEV Sales By Model (Clean Data) (2).xlsx")
+
+PEVSales <- PEVSales %>% 
+  select(-Total) %>% 
+  pivot_longer(cols=`2011`:`2019`, names_to = 'Year', values_to = 'Sales') %>% 
+  mutate(Year = as.numeric(Year),
+         Vehicle = as.factor(Vehicle),
+         Type = as.factor(Type)) %>% 
+  na.omit()
+
+PEVSales %>% 
+  group_by(Type, Year) %>% 
+  summarise(Total_Sales = sum(Sales)) %>% 
+  ggplot() +
+  aes(x=Year, y=Total_Sales, colour=Type) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
+  geom_line() +
+  geom_point()+
+  scale_x_continuous(breaks = seq(2010, 2019, 1)) +
+  labs(
+    x = "Year",
+    y = "PHEV vs EV Sales",
+    title = "Total Sales of PHEV & EV from 2011-2019"
+  )
+
+```
+
+Below, we read in the Monthly Transportation Statistics data set. It is a very large data set, dating back to the 1940s with over 100 columns, so we will not include descriptions for all of them. The only variables we used were the date, which is the date given down to the month, and the auto sales, which is the number of sales of gas powered automobiles per month. We also read in the ev sales data set here, which is the same as used above, so that we could compare sales for both. While EV sales are still much smaller than gas powered automobile sales, there is still a clear increase in EV sales as gas powered vehicle sales decrease. 
+We chose to focus on total sales per year, to keep with the same splitting by year throughout the rest of the project. We chose total over average because it makes more sense to study the total changes for sales. 
+
+```{r}
+#Comparison of EV Sales & Gas Vehicle Sales (Slide 11)
+
+#read in auto sales dataset
+car_data <- read.csv("/Users/broiwniemixxx/Desktop/Project DataSets/Monthly_Transportation_Statistics.csv")
+#save auto sales to variable
+auto_sales <- car_data$Auto.sales
+#save date
+sales_date <- car_data$Date
+#convert date from character to numeric (date format)
+library(lubridate)
+dates <- as.POSIXct(sales_date,format="%m/%d/%Y  %H:%M:%S %p")
+
+#create dataframe with dates and auto sales
+df_sales <- data.frame(dates, auto_sales)
+head(df_sales)
+#look for where na values are located
+is.na(auto_sales)
+df_sales_clean <- df_sales[241:910,] #na values only occur for beginning of data set. manually slicing at those indices
+head(df_sales_clean) #checking upper bound of cut
+tail(df_sales_clean) #checking lower bound of cut
+
+#total sales per year - to have same format as gas price & price of cars
+#sales go back to 1967 w this data - starting the averages at 1995 to match above data as well
+sales95 <- df_sales_clean[337:348,]
+tot_sales95 <- sum(sales95$auto_sales)
+sales96 <- df_sales_clean[349:360,]
+tot_sales96 <- sum(sales96$auto_sales)
+sales97 <- df_sales_clean[361:372,]
+tot_sales97 <- sum(sales97$auto_sales)
+sales98 <- df_sales_clean[373:384,]
+tot_sales98 <- sum(sales98$auto_sales)
+sales99 <- df_sales_clean[385:396,]
+tot_sales99 <- sum(sales99$auto_sales)
+sales00 <- df_sales_clean[397:408,]
+tot_sales00 <- sum(sales00$auto_sales)
+sales01 <- df_sales_clean[409:420,]
+tot_sales01 <- sum(sales01$auto_sales)
+sales02 <- df_sales_clean[421:432,]
+tot_sales02 <- sum(sales02$auto_sales)
+sales03 <- df_sales_clean[433:444,]
+tot_sales03 <- sum(sales03$auto_sales)
+sales04 <- df_sales_clean[445:456,]
+tot_sales04 <- sum(sales04$auto_sales)
+sales05 <- df_sales_clean[457:468,]
+tot_sales05 <- sum(sales05$auto_sales)
+sales06 <- df_sales_clean[469:480,]
+tot_sales06 <- sum(sales06$auto_sales)
+sales07 <- df_sales_clean[481:492,]
+tot_sales07 <- sum(sales07$auto_sales)
+sales08 <- df_sales_clean[493:504,]
+tot_sales08 <- sum(sales08$auto_sales)
+sales09 <- df_sales_clean[505:516,]
+tot_sales09 <- sum(sales09$auto_sales)
+sales10 <- df_sales_clean[517:528,]
+tot_sales10 <- sum(sales10$auto_sales)
+sales11 <- df_sales_clean[529:540,]
+tot_sales11 <- sum(sales11$auto_sales)
+sales12 <- df_sales_clean[541:552,]
+tot_sales12 <- sum(sales12$auto_sales)
+sales13 <- df_sales_clean[553:564,]
+tot_sales13 <- sum(sales13$auto_sales)
+sales14 <- df_sales_clean[565:576,]
+tot_sales14 <- sum(sales14$auto_sales)
+sales15 <- df_sales_clean[577:588,]
+tot_sales15 <- sum(sales15$auto_sales)
+sales16 <- df_sales_clean[589:600,]
+tot_sales16 <- sum(sales16$auto_sales)
+sales17 <- df_sales_clean[601:612,]
+tot_sales17 <- sum(sales17$auto_sales)
+sales18 <- df_sales_clean[613:624,]
+tot_sales18 <- sum(sales18$auto_sales)
+sales19 <- df_sales_clean[625:636,]
+tot_sales19 <- sum(sales19$auto_sales)
+sales20 <- df_sales_clean[637:648,]
+tot_sales20 <- sum(sales20$auto_sales)
+sales21 <- df_sales_clean[649:660,]
+tot_sales21 <- sum(sales21$auto_sales)
+sales22 <- df_sales_clean[661:672,]
+tot_sales22 <- sum(sales22$auto_sales)
+
+#create array with total sales
+tot_car_sales <- c(tot_sales95, tot_sales96, tot_sales97, tot_sales98, tot_sales99, tot_sales00, tot_sales01, tot_sales02, tot_sales03, tot_sales04, tot_sales05, tot_sales06, tot_sales07, tot_sales08, tot_sales09, tot_sales10, tot_sales11, tot_sales12, tot_sales13, tot_sales14, tot_sales15, tot_sales16, tot_sales17, tot_sales18, tot_sales19, tot_sales20, tot_sales21)
+#read in ev sales
+ev_sales <- read_excel('/Users/broiwniemixxx/Desktop/Project DataSets/PEV Sales By Model (Clean Data) (2).xlsx')
+head(ev_sales)
+#rename columns (due to an odd import)
+colnames(ev_sales)[3] = '2011'
+colnames(ev_sales)[4] = '2012'
+colnames(ev_sales)[5] = '2013'
+colnames(ev_sales)[6] = '2014'
+colnames(ev_sales)[7] = '2015'
+colnames(ev_sales)[8] = '2016'
+colnames(ev_sales)[9] = '2017'
+colnames(ev_sales)[10] = '2018'
+colnames(ev_sales)[11] = '2019'
+#transform data for easier analysis
+ev_sales <- ev_sales %>%
+  select(-Total) %>%
+  pivot_longer(cols='2011':'2019', names_to = 'Year', values_to = 'Sales') %>%
+  mutate(Year = as.numeric(Year),
+         Vehicle = as.factor(Vehicle),
+         Type = as.factor(Type)) %>%
+  na.omit() 
+#arrange by year
+ev_sales <- ev_sales %>% 
+  arrange(Year)
+#save data as data frame
+ev_sales <- data.frame(ev_sales)
+str(ev_sales) #confirm it saved correctly
+#break up data by year and find total sales per year
+evsales11 <- ev_sales[ev_sales$Year == '2011',]
+tot_evsales11 <- sum(evsales11$Sales)
+evsales12 <- ev_sales[ev_sales$Year == '2012',]
+tot_evsales12 <- sum(evsales12$Sales)
+evsales13 <- ev_sales[ev_sales$Year == '2013',]
+tot_evsales13 <- sum(evsales13$Sales)
+evsales14 <- ev_sales[ev_sales$Year == '2014',]
+tot_evsales14 <- sum(evsales14$Sales)
+evsales15 <- ev_sales[ev_sales$Year == '2015',]
+tot_evsales15 <- sum(evsales15$Sales)
+evsales16 <- ev_sales[ev_sales$Year == '2016',]
+tot_evsales16 <- sum(evsales16$Sales)
+evsales17 <- ev_sales[ev_sales$Year == '2017',]
+tot_evsales17 <- sum(evsales17$Sales)
+evsales18 <- ev_sales[ev_sales$Year == '2018',]
+tot_evsales18 <- sum(evsales18$Sales)
+evsales19 <- ev_sales[ev_sales$Year == '2019',]
+tot_evsales19 <- sum(evsales19$Sales)
+#save total ev sales as array
+tot_evsales <- c(tot_evsales12, tot_evsales13, tot_evsales14, tot_evsales15, tot_evsales16, tot_evsales17,tot_evsales18,tot_evsales19)
+
+#add total sales for both types of car to previously created dataframe
+plot_data <- data.frame(plot_data,tot_evsales,tot_car_sales[18:25])
+#rename column to a more user-friendly name
+colnames(plot_data)[6] <- 'tot_car_sales'
+#plot total sales for both vehicles on one plot
+plot_data %>%
+   ggplot() + geom_line(aes(x=year,y=tot_car_sales,color='gas')) + geom_line(aes(x=year,y=tot_evsales,color='electric'))+ggtitle('Gas vs Electricity Sales') + labs(x='year',y='total sales') + scale_color_manual(name="Vehicle Type", labels=c("Electric", "Gas"), values=c("blue", "green"))
+```
+Seeing the increasing trend in EV sales as gas powered vehicle sales decreased, we wondered if there was a correlation. So, we ran the following linear model, and included gas and electricity cost as well.
+
+We were interested ot see what variables played a role in the change in gas price, and if we could make a prediction model based on our data to predict what gas prices will be in the future. We created the following linear regression model, using the average price of the gas powered car, the total gas powered car sales, and the average cost of electricity to predict the average price of gas per gallon. We chose these because we thought the use of gas-powered cars would impact the demand for gas, and thus the price. We included the cost of electricity as well to introduce some competition.
+
+```{r}
+#Gas Price Regression Model (Slide 7)
+
+model4 <- lm(plot_data$average.price.of.gas.per.gallon ~ plot_data$average.price.of.car + plot_data$tot_car_sales + plot_data$avg_ecost)
+summary(model4)
+```
+With this model, only the average price of the car was a statistically significant interaction. With that, it actually suggests a decrease in gas price as the price of the car increases. With an adjusted R-squared of 76%, this model fits our data fairly well. 
+We then use this model to predict gas prices based on past data, as seen below.
+
+```{r}
+#Gas Price Prediction (Slide 8)
+
+predict(model4, plot_data)
+plot(x=predict(model4,plot_data),
+     xlab='Predicted Values Index',
+     ylab='Predicted Gas Price',
+     main='Gas Price Prediction')
+```
+As the model suggested, the gas price does eventually go down. This is a surprising result, as we've seen gas prices generally trending upwards.
+```{r}
+#Linear Regression on Sales Data (Slide 12)
+
+model3 <- lm(plot_data$tot_evsales ~ plot_data$tot_car_sales + plot_data$average.price.of.gas.per.gallon + plot_data$avg_ecost)
+summary(model3)
+```
+
+The total gas powered car sales was the only statistically significant interaction between the variables, which we found to be surprising - we thought that gas price would have been significant. This is a good model, though, as the adjusted R-squared is 83.11%, which indicates a good fit to our data. This model also suggests that sales of EVs decrease as sales in gas-powered vehicles increase, which makes sense logically.
+
+```{r}
+#Average Maintenance & Repair Cost Per Year for Gasoline Vehicles and EV & PHEV Vehicles (Slide 15)
+
+#Gasoline Vehicles
+list_of_files5 <- list.files(path = "/Users/broiwniemixxx/Desktop/Maintenance Cost for Gas Cars", pattern = "*.csv", full.names = TRUE)
+
+df <- list_of_files5 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+
+df[df$X1 != "QYEAR", ]
+df <- df[df$X1 != "QYEAR", ]
+df <- df[!grepl("N/A", df$X2),]
+df <- df[df$X2 != ".", ]
+
+names(df)[1] <- "Year"
+names(df)[2] <- "Cost"
+
+df$Cost= as.numeric(df$Cost)
+
+ServiceCostGas <- df
+
+ServiceCostGasAvg <- aggregate(x = ServiceCostGas$Cost,
+by = list(ServiceCostGas$Year), FUN = mean) 
+
+names(ServiceCostGasAvg)[1] <- "Year"
+names(ServiceCostGasAvg)[2] <- "Cost"
+
+list_of_files6 <- list.files(path = "/Users/broiwniemixxx/Desktop/Maintenance Cost for Gas Cars/Vot", pattern = "*.csv", full.names = TRUE)
+
+df <- list_of_files6 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+
+df <- df[df$X1 != "QYEAR", ]
+df <- df[!grepl("N/A", df$X2),]
+df <- df[df$X2 != ".", ]
+df <- df[df$X2 != "0", ]
+
+names(df)[1] <- "Year"
+names(df)[2] <- "Cost"
+df$Cost = as.numeric(df$Cost)
+
+MaintenanceCostGas <- df
+
+MaintenanceCostGasAvg <- aggregate(x = MaintenanceCostGas$Cost, by = list(MaintenanceCostGas$Year), FUN = mean) 
+
+names(MaintenanceCostGasAvg)[1] <- "Year"
+names(MaintenanceCostGasAvg)[2] <- "Cost"
+
+MaintenanceCostGasAvg$Cost <- MaintenanceCostGasAvg$Cost + 1601
+
+
+MRCT <- merge(MaintenanceCostGasAvg, ServiceCostGasAvg, by=c("Year"))
+MRCT$Cost.x <- MRCT$Cost.x +MRCT$Cost.y
+
+names(MRCT)[2] <- "Cost"
+MRCT<- MRCT[ -c(3) ]
+
+
+#Electric & PHEV
+list_of_files1 <- list.files(path = "/Users/broiwniemixxx/Desktop/vot_2005-2012", pattern = "*.csv", full.names = TRUE)
+
+Vot2005 <- list_of_files1 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+
+Vot2005 = Vot2005[-1,]
+
+names(Vot2005)[1] <- "Year"
+names(Vot2005)[2] <- "NEWID"
+names(Vot2005)[3] <- "MaintCost"
+
+Vot2005[Vot2005 == "."] <- '0'
+
+Vot2005$MaintCost <- as.numeric(Vot2005$MaintCost)
+
+Vot2005 <- Vot2005[- grep("QYEAR", Vot2005$Year),]
+
+list_of_files2 <- list.files(path = "/Users/broiwniemixxx/Desktop/ovb_2005-2012", pattern = "*.csv", full.names = TRUE)
+
+Ovb2005 <- list_of_files2 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+
+names(Ovb2005)[1] <- "Year"
+names(Ovb2005)[2] <- "NEWID"
+names(Ovb2005)[3] <- "Make"
+names(Ovb2005)[4] <- "Model"
+names(Ovb2005)[5] <- "FuelType"
+
+Ovb2005 <- Ovb2005[- grep("QYEAR", Ovb2005$Year),]
+
+Elec2005 <- filter(Ovb2005,FuelType==3| FuelType==4)
+
+#The file included a table that was specific to fuel costs, with the values 3 = Hybrid Electric Power and 4= Electric Only
+
+Cost2005 <- merge(Elec2005, Vot2005, by=c("Year","NEWID"))
+
+ElecCostAvg2005 <- aggregate(x = Cost2005$MaintCost, by = list(Cost2005$Year), FUN=(function(x){ifelse(sum(x==0)>0 & sum(x !=0) >0, mean(x[x>0]), mean(x))}))
+
+names(ElecCostAvg2005)[1] <- "Year"
+names(ElecCostAvg2005)[2] <- "Cost"
+
+list_of_files3 <- list.files(path = "/Users/broiwniemixxx/Desktop/vot_2013-2021", pattern = "*.csv", full.names = TRUE)
+
+Vot2013 <- list_of_files3 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+
+Vot2013 = Vot2013[-1,]
+
+names(Vot2013)[1] <- "Year"
+names(Vot2013)[2] <- "NEWID"
+names(Vot2013)[3] <- "MaintCost"
+
+Vot2013$MaintCost <- as.numeric(Vot2013$MaintCost)
+
+list_of_files4 <- list.files(path = "/Users/broiwniemixxx/Desktop/ovb_2013-2021", pattern = "*.csv", full.names = TRUE)
+
+Ovb2013 <- list_of_files4 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+
+Ovb2013 = Ovb2013[-1,]
+
+names(Ovb2013)[1] <- "Year"
+names(Ovb2013)[2] <- "NEWID"
+names(Ovb2013)[3] <- "Make"
+names(Ovb2013)[4] <- "Model"
+names(Ovb2013)[5] <- "FuelType"
+
+Elec2013 <- filter(Ovb2013,FuelType==3| FuelType==4)
+
+Cost2013 <- merge(Elec2013, Vot2013, by=c("Year","NEWID"))
+
+ElecCostAvg2013 <- aggregate(x = Cost2013$MaintCost, by = list(Cost2013$Year), FUN=(function(x){ifelse(sum(x==0)>0 & sum(x !=0) >0, mean(x[x>0]), mean(x))}))
+
+names(ElecCostAvg2013)[1] <- "Year"
+names(ElecCostAvg2013)[2] <- "Cost"
+
+list_of_files3 <- list.files(path = "/Users/broiwniemixxx/Desktop/Veq_2013-2021", pattern = "*.csv", full.names = TRUE)
+Veq2013 <- list_of_files3 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+              
+names(Veq2013)[1] <- "Year"
+names(Veq2013)[2] <- "NEWID"
+ names(Veq2013)[6] <- "Cost"
+Veq2013 <- select(Veq2013, Year, NEWID, Cost)
+Veq2013 <- Veq2013[- grep("QYEAR", Veq2013$Year),]
+Veq2013$Year = substr(Veq2013$Year, 1, nchar(Veq2013$Year)-1)
+Veq2013$Cost <- as.numeric(Veq2013$Cost)
+Cost2013 <- merge(Cost2013,Veq2013, by=c("Year","NEWID"))
+Cost2013<- Cost2013[ -c(7) ]
+
+Veq2013 <- aggregate(x = Veq2013$Cost, by = list(Veq2013$Year), FUN=(function(x){ifelse(sum(x==0)>0 & sum(x !=0) >0, mean(x[x>0]), mean(x))}))
+
+names(Veq2013)[1] <- "Year"
+names(Veq2013)[2] <- "Cost"
+
+ElecCostAvg2013 <- merge(ElecCostAvg2013,Veq2013, by="Year")
+
+ElecCostAvg2013<- ElecCostAvg2013[ -c(3) ]
+names(ElecCostAvg2013)[2] <- "Cost"
+
+ElectAvgT <- rbind(ElecCostAvg2005, ElecCostAvg2013)
+CostT <- rbind(Cost2005, Cost2013)
+
+ElectAvgT$Cost <- ElectAvgT$Cost + 2286
+
+ElectAvgT <- ElectAvgT %>%
+mutate(Cost=replace(Cost, Cost==2295.375, 2310.375)) %>%
+as.data.frame()
+
+list_of_files3 <- list.files(path = "/Users/broiwniemixxx/Desktop/Veq_2013-2021", pattern = "*.csv", full.names = TRUE)
+Veq2013 <- list_of_files3 %>% setNames(nm = .) %>% map_df(~read_csv(.x, col_types = cols(), col_names = FALSE))
+                                                                                                                                                                                 
+names(Veq2013)[1] <- "Year"
+names(Veq2013)[2] <- "NEWID"
+ names(Veq2013)[6] <- "Cost"
+Veq2013 <- select(Veq2013, Year, NEWID, Cost)
+Veq2013 <- Veq2013[- grep("QYEAR", Veq2013$Year),]
+Veq2013$Year = substr(Veq2013$Year, 1, nchar(Veq2013$Year)-1)
+Veq2013$Cost <- as.numeric(Veq2013$Cost)
+Cost2013 <- merge(Cost2013,Veq2013, by=c("Year","NEWID"))
+Cost2013<- Cost2013[ -c(7) ]
+
+Veq2013 <- aggregate(x = Veq2013$Cost, by = list(Veq2013$Year), FUN=(function(x){ifelse(sum(x==0)>0 & sum(x !=0) >0, mean(x[x>0]), mean(x))}))
+
+names(Veq2013)[1] <- "Year"
+names(Veq2013)[2] <- "Cost"
+
+ElecCostAvg2013 <- merge(ElecCostAvg2013,Veq2013, by="Year")
+
+ElecCostAvg2013<- ElecCostAvg2013[ -c(3) ]
+names(ElecCostAvg2013)[2] <- "Cost"
+
+#In order to make the data more fitting, we added the national average cost for car insurance for both gasoline and PHEV/EV vehicles. This decision was made because the values weren't that high and because vehicles in most states require a car top be insured.
+
+CombinedPlot <- ggplot() + geom_line(data=ElectAvgT, aes(Year, Cost, group=1,color="Electric"))+ geom_point() + geom_line(data=MRCT, aes(Year, Cost, group=1,color="Gas")) + theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) + ggtitle("Average Yearly Maintenance & Repair Costs for Electric/PHEV & Gas Vehicles") + scale_color_manual(name="Vehicle Type", labels=c("Electric & Hybrid", "Gas"), values=c("blue", "green"))
+CombinedPlot
+
+```
+
+In order to compile all the data together, we used the list.files function to have R Studio read all the files in a specific location on my desktop and combine them by column names. The dataset used was from the Customer Expenditure Surveys from 1995-2021. We were specifically looking at consumer responses to amounts spent on vehicle maintenance and repairs. This data included oil changes, brake fluid, transmission fluid, and out-of-pocket repair costs per year. Each entry had a specif "NEWID" that was used across all files and was specific to the respondant. With R, we were able to merge the tables based on that NEWID to ensure that the respondant from one file was the same as the respondant in a different file.
+
+As we can see, maintenance for EV/PHEV Vehicles are more expensive than gasoline vehicles. This isn't surprising, however, since the technology is newer and more expensive to produce.
+
+```{r}
+#Total Maintenance Cost of EV & PHEV Vehicles (Slide 16)
+
+Cost_of_Ownership <- read.csv("/Users/broiwniemixxx/Desktop/Project DataSets/DES_Total_Cost_of_Ownership_V2 (Clean Data).csv")
+ggplot(data = Cost_of_Ownership, aes(y = Make_Model, x = Total_Maintenance_Cost)) +
+  geom_bar(stat = "identity", fill = "darkolivegreen3") +
+  scale_x_continuous(labels = label_dollar()) +
+  xlab("Total Maintenance Cost") +
+  ylab("") +
+  ggtitle("Maintenance Costs by Car Make and Model") +
+  theme_minimal()
+```
+
+This dataset was used to analyze the total lifetime cost of ownership of owning particular plug-in hybrid electric vehicle (PHEV) and electric vehicles (EV). By doing so, we were able to confirm trends and understand how much money consumers can potentially save by choosing an PHEV or EV vehicle over a gasoline-powered vehicle.
+
+The variables used were:
+Make_Model: Make and Model of the plug-in hybrid electric vehicle (PHEV) or electric vehicle (EV)
+Total_Estimated_Lifetime_Cost: Total Cost of Ownership which consist of the maintenance + cost of the vehicle
+
+```{r}
+#Total Cost of Ownership - Vehicle Cost + Maintenance (Slide 17)
+
+ggplot(data = Cost_of_Ownership, aes(y = Make_Model, x = Total_Estimated_Lifetime_Cost)) +
+  geom_bar(stat = "identity", fill = "darkolivegreen3") +
+  scale_x_continuous(labels = label_dollar()) +
+  xlab("Total Lifetime Cost") +
+  ylab("") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+We ran a linear regression model on the total lifetime cost versus total maintenance cost of plug-in hybrid electric vehicle (PHEV) and EV vehicles in order to understand the relationship between these two variables. We also looked for patterns or trends in the data and aimed to understand how these two variables are related. The base total maintenance cost was $4,589, and the contributing factor of this model was the total estimated lifetime cost.
+
+The variables used were:
+Make_Model: Make and Model of the plug-in hybrid electric vehicle (PHEV) or electric vehicle (EV)
+Total_Maintenance_Cost: Total Cost of Maintenance Per Year
+Total_Estimated_Lifetime_Cost: Total Cost of Ownership which consist of the maintenance + cost of the vehicle
+
+Overall, the results of the linear regression model showed that the p-value was 0.5241. This indicates that there is not a statistically significant relationship between the predictor (total maintenance cost) and the response variable (total lifetime cost) for PHEV and EV vehicles."
+
+```{r}
+#Linear Regression Model on Total Lifetime Cost vs Total Maintenance Cost of PHEV & EV Vehicles (Slide 18)
+
+LModel <- lm(Total_Maintenance_Cost ~ Total_Estimated_Lifetime_Cost, data = Cost_of_Ownership)
+summary(LModel)
+
+ggplot(data = Cost_of_Ownership, aes(x = Total_Estimated_Lifetime_Cost, y = Total_Maintenance_Cost)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "darkolivegreen4")+
+  theme_minimal()+
+  scale_x_continuous(name = "Cost of Ownership") +
+  scale_y_continuous(name = "Cost of Maintenance") +
+  ggtitle("Linear Regression:Total Lifetime Cost VS Total Maintenance Cost ")
+
+
+```
+
+```{r}
+#Regression of Key Variables (Slide 20)
+
+#Initial Regression with all variables
+Reg <-read_excel("/Users/broiwniemixxx/Desktop/Project DataSets/Reg.xlsx")
+
+Reg1 <- lm(formula = PlugInHybridEVSales ~ Year + PPGGas + PlugInHybridEVPrice + ElectricityCostkWh + MaintCostGas + MaintCostEV, data = Reg)
+summary(Reg1)
+#With all the variables combined, we can see that none of the p-values are significant, thus none of the variables were significant in increasing/decreasing sales of electric and PHEV vehicles. We decided to eliminate the maintenance costs and see how the model ran without them.
+
+#Second Regression for only significant variables
+RegM2 <- lm(formula=PlugInHybridEVSales~ Year + PPGGas + AveragePriceofGasVehicle + PlugInHybridEVPrice, data = Reg)
+summary(RegM2)
+#With all the variables combined, we can see that none of the p-values are significant, except the Year. There can be many explaniations for why the Year is significant that are not in the scope of our project.
+```
+#Conclusion: 
+Our analysis revealed a negative correlation between sales of gasoline-powered vehicles and sales of plug-in hybrid electric vehicles (PHEVs) and electric vehicles (EVs). However, we did not find that changes in the price of gasoline per gallon or electricity per kilowatt hour significantly impacted sales of these types of vehicles. We also found that maintenance costs were not significantly contributing factors to the total lifetime cost of the vehicle. These results suggest that factors other than fuel and maintenance costs may be driving changes in sales of PHEVs and EVs.
